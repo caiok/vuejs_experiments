@@ -1,2 +1,2 @@
 # Vue.js Experiments
-Nothing special
+These only make sense to me :-)

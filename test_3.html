@@ -1,0 +1,114 @@
+<html>
+	<head>
+		<title>Vue.js Test - Events bus</title>
+		
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		
+		<script type="text/javascript" src="vue.js"></script>
+		
+		<style>
+			#app {
+				text-align: center;
+			}
+			.container {
+				border: solid 1px #DDD;
+				padding: 2%;
+				margin: 2%;
+			}
+			
+		</style>
+	</head>
+	<body>
+		<div id="app1">
+			<h3>My app1</h3>
+			{{message}}
+			<comp1 v-on:to_vue_data="message=arguments[0]"></comp1>
+			<comp2></comp2>
+		</div>
+		
+		<template id="temp1">
+			<div class="container">
+				<p>Comp 1</p>
+				<input v-model="message_comp1"/>
+				<button v-on:click="send">Click to send</button>
+			</div>
+		</template>
+		
+		<template id="temp2">
+			<div class="container">
+				<p>Comp 2</p>
+				<p>{{message_comp2}}</p>
+			</div>
+		</template>
+		
+		<script>
+			
+			var bus = new Vue();
+			
+			/* ====================================================== */
+			
+			Vue.component('comp1', {
+				template: "#temp1",
+				
+				data: function() {
+					return {
+						message_comp1: 'Message to be sent...',
+					}
+				},
+				props: [
+				],
+				methods: {
+					send: function() {
+						this.$emit('to_vue_data', this.message_comp1);
+						bus.$emit('to_comp2', this.message_comp1);
+					}
+				}
+			});
+			
+			/* ------------------------------------------------------ */
+			
+			Vue.component('comp2', {
+				template: "#temp2",
+				
+				data: function() {
+					return {
+						message_comp2: 'Waiting for message...',
+					}
+				},
+				props: [
+				],
+				methods: {
+				},
+				
+				// hook called whene the component is created
+				created: function() {
+					bus.$on('to_comp2', function(v) {
+						// "this" in this context is referred to "bus", not "comp2", so
+						// we need to bind the "this" of comp2 to the function
+						this.message_comp2 = v;
+					}.bind(this));
+				}
+			});
+			
+			/* ====================================================== */
+			
+			var vm1 = new Vue({
+				el: '#app1',
+				data: {
+					message: 'Upper message...',
+				},
+				
+				methods: {
+				},
+				
+				filters: {
+				},
+				
+				computed: {
+				},
+			});
+			
+		</script>
+	</body>
+</html>
