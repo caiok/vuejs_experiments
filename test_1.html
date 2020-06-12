@@ -1,0 +1,202 @@
+<html>
+	<head>
+		<title>Vue.js Test</title>
+		
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		
+		<script type="text/javascript" src="vue.js"></script>
+		
+		<style>
+			#app {
+				text-align: center;
+			}
+			.container {
+				border: solid 1px #DDD;
+				padding: 2%;
+				margin: 2%;
+			}
+			
+			.my-red {
+				color: red;
+			}
+			.my-blue-back {
+				background-color: blue;
+			}
+			.my-big {
+				font-size: 120%;
+			}
+			
+			.textarea-warning {
+				border: solid 2px red;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app">
+			<div class="container">
+				<button @click="switch_p()">click me</button>
+				<p v-show="display_p">I'm a P</p>
+			</div>
+			
+			<div class="container">
+				<p v-if="if_value % 3 === 0">{{if_value}} % 3 = 0</p>
+				<p v-else-if="if_value % 3 === 1">{{if_value}} % 3 = 1</p>
+				<p v-else>{{if_value}} % 3 = 2</p>
+				<button @click="if_value = if_value + 1">Advance</button>
+			</div>
+			
+			<div class="container">
+				<input type="text" v-model="inp_text_1" />
+				<p>inp_text_1 = {{inp_text_1}}</p>
+				
+				<hr />
+				
+				<input type="text" v-model.lazy="inp_text_2" />
+				<p>inp_text_2 = {{inp_text_2}}</p>
+				
+				<hr />
+				
+				Radio:<br>
+				<input type="radio" v-model="inp_radio_1" value="Val 1" /> Val 1<br/>
+				<input type="radio" v-model="inp_radio_1" value="Val 2" /> Val 2<br/>
+				<input type="radio" v-model="inp_radio_1" value="Val 3" /> Val 3<br/>
+				<p>Radio value: {{inp_radio_1}}</p>
+				
+				<hr />
+				
+				Checkbox:<br>
+				<input type="checkbox" v-model="inp_checkbox_1" value="Val 1" /> Val 1<br/>
+				<input type="checkbox" v-model="inp_checkbox_1" value="Val 2" /> Val 2<br/>
+				<input type="checkbox" v-model="inp_checkbox_1" value="Val 3" /> Val 3<br/>
+				<p>Checkbox value: {{inp_checkbox_1}}
+				<br>Note: the array order is the user selection order 
+				</p>
+				
+				<hr />
+				
+				Select:
+				<select v-model="inp_select_1_val">
+					<option v-for="opt in inp_select_1_options" v-bind:value="opt.value">{{opt.text}}</option>
+				</select>
+				<p>Select value: {{inp_select_1_val}}</p>
+			</div>
+			
+			<div class="container">
+				<input type="text" v-model="inp_text_3" />
+				<p v-bind:title="inp_text_3|capitalize">inp_text_3 = {{inp_text_3|capitalize}}</p>
+				
+				<hr />
+				
+				<input type="text" v-model="inp_text_4" />
+				<p v-bind:title="inp_text_4_computed">inp_text_4_computed = {{inp_text_4_computed}}</p>
+				
+				<hr />
+				
+				First name: <input type="text" v-model="first_name" />
+				Last name: <input type="text" v-model="last_name" />
+				<br />
+				Full name: <input type="text" v-model="full_name" />
+			</div>
+			
+			<div class="container">
+				<div v-bind:class="class_val_1">DIV 1</div>
+				<div v-bind:class="class_val_2">DIV 2</div>
+				<div v-bind:class="class_val_3">DIV 3</div>
+				<div v-bind:style="style_val_1">DIV 4</div>
+			</div>
+			
+			<div class="container">
+				<textarea v-model="inp_textarea_1_value"
+				          v-on:input="inp_textarea_1_check"
+				          v-bind:class="{'textarea-warning': inp_textarea_1_remain <= 0}" ></textarea>
+				<div>Limit {{inp_textarea_1_remain}}/{{inp_textarea_1_limit}}</div>
+			</div>
+		</div>
+		
+		<script>
+			var vm = new Vue({
+				el: '#app',
+				data: {
+					message: 'cieo!',
+					
+					display_p: true,
+					if_value: 0,
+					
+					inp_text_1: 'my text 1',
+					inp_text_2: 'my text 2',
+					inp_radio_1: 'Val 2',
+					inp_checkbox_1: [],
+					inp_select_1_val: 'default',
+					inp_select_1_options: [
+						{value: 'val_1', text: 'Val 1'},
+						{value: 'val_2', text: 'Val 2'},
+						{value: 'val_3', text: 'Val 3'},
+					],
+					
+					inp_text_3: 'Value',
+					inp_text_4: 'Computed Value',
+					
+					first_name: '',
+					last_name: '',
+					
+					class_val_1: 'my-big',
+					class_val_2: ['my-red', 'my-blue-back'],
+					class_val_3: {
+						'my-red': true,
+						'my-blue-back': false,
+						'my-big': true,
+					},
+					style_val_1: {
+						'color': 'yellow',
+						'background-color': 'grey',
+						'opacity': 0.5, // vue.js will add any browser prefixes like -moz-, -webkit-, etc. 
+					},
+					
+					inp_textarea_1_value: 'Type text here...',
+					inp_textarea_1_limit: 50,
+				},
+				
+				methods: {
+					hello: function() {
+						console.log(this.message);
+					},
+					switch_p: function() {
+						this.display_p = !this.display_p;
+					},
+					
+					inp_textarea_1_check: function() {
+						this.inp_textarea_1_value = this.inp_textarea_1_value.substr(0, this.inp_textarea_1_limit);
+					}
+				},
+				
+				filters: {
+					capitalize: function(v) {
+						return v.toUpperCase();
+					}
+				},
+				
+				computed: {
+					inp_text_4_computed: function() {
+						return this.inp_text_4 + " <=> " + this.inp_text_4; 
+					},
+					
+					full_name: {
+						get: function() {
+							return this.first_name + ' ' + this.last_name;
+						},
+						set: function(v) {
+							var splitted = v.split(' ');
+							this.first_name = splitted[0];
+							this.last_name = splitted[1];
+						}
+					},
+					
+					inp_textarea_1_remain: function() {
+						return this.inp_textarea_1_limit - this.inp_textarea_1_value.length;
+					}
+				}
+			});
+		</script>
+	</body>
+</html>

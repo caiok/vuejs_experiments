@@ -1,0 +1,250 @@
+<html>
+	<head>
+		<title>Vue.js Test 2</title>
+		
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		
+		<script type="text/javascript" src="vue.js"></script>
+		
+		<style>
+			#app {
+				text-align: center;
+			}
+			.container {
+				border: solid 1px #DDD;
+				padding: 2%;
+				margin: 2%;
+			}
+			
+		</style>
+	</head>
+	<body>
+		<div id="app1">
+			<!-- Local and global scopes -->
+			<h3>My app1</h3>
+			<global_component_1></global_component_1>
+			<local_component_1></local_component_1>
+		</div>
+		
+		<div id="app2">
+			<!-- Local and global scopes -->
+			<h3>My app2</h3>
+			<global_component_1></global_component_1>
+			<local_component_1></local_component_1>
+		</div>
+		
+		<div id="app3">
+			<!-- Sending data from vue VM to the component and vice versa -->
+			<h3>My app3</h3>
+			<div>
+				To the container: <input type="text" v-model="data_to_component">
+				<br />
+				From the container: {{data_from_component}}
+			</div>
+			
+			<global_component_2 msg_from_outside="Static value"></global_component_2>
+			
+			<!--
+			In this case we used an inline JS for the v-on
+			"arguments" here is an array of arguments passed to $emit
+			-->
+			<global_component_2 
+				v-bind:msg_from_outside="data_to_component"
+				v-on:to_outside_event="data_from_component = arguments[0]"></global_component_2>
+			
+			<!-- For registering v-on to JS native events, in component we must use
+			     v-on:EVENT.native, e.g. v-on:click.native -->
+			<global_component_2 
+				v-bind:msg_from_outside="data_to_component"
+				v-on:to_outside_event="load_data_from_component"
+				v-on:click.native="log_click_to_console"></global_component_2>
+			
+			<!-- This is a component with an inner content. We can use <slot></slot> to decide
+			     where to put it (we can use it how many times we like) -->
+			<global_component_2 
+				v-bind:msg_from_outside="data_to_component"
+				v-on:to_outside_event="load_data_from_component">
+				<u>My wonderful slot comntent</u>
+			</global_component_2>
+			
+			<!-- We can even have multimple slots! We are going to name them and use them
+			     wherever we like. The non-named elements, will be all grouped in the
+			     generic anonymous <slot></slot> -->
+			<global_component_3>
+				<p slot="slot-1">My wonderful FIRST</p>
+				<p slot="slot-2">My wonderful SECOND</p>
+				<p>Unnamed slot</p>
+				<p>Unnamed slot</p>
+				<p>Unnamed slot</p>
+			</global_component_3>
+		</div>
+		
+		<template id="global_component_1_temp">
+			<div class="container">
+				<p>My global component 1!</p>
+				<p>{{message}}</p>
+			</div>
+		</template>
+		
+		<template id="global_component_2_temp">
+			<div class="container">
+				<p>My global component 2!</p>
+				<slot></slot>
+				<p>Message from the outer world: {{msg_from_outside}}</p>
+				<slot></slot>
+				<div>
+					<input type="text" v-model="msg_to_outside"/>
+					<button v-on:click="send_to_outside()">Send</button>
+				</div>
+			</div>
+		</template>
+		
+		<template id="global_component_3_temp">
+			<div class="container">
+				<p>Normal content 1</p>
+				<slot name="slot-2"></slot>
+				<slot></slot>
+				<slot name="slot-1"></slot>
+				<p>Normal content 2</p>
+				<slot name="slot-1"></slot>
+			</div>
+		</template>
+		
+		<script>
+			// Components names should be undescore separated lowercase, in order to
+			// not interfere with HTML standards (that are case insensitive), since it
+			// has to be used as a HTML tag
+			
+			/* ------------------------------------------------------ */
+			
+			Vue.component('global_component_1', {
+				template: "#global_component_1_temp",
+				
+				data: function() {
+					return {
+						message: 'Cieo!',
+					}
+				},
+				props: [
+				],
+				methods: {
+				}
+			});
+			
+			/* ------------------------------------------------------ */
+			
+			Vue.component('global_component_2', {
+				template: "#global_component_2_temp",
+				
+				data: function() {
+					return {
+						msg_to_outside: 'To outside',
+					}
+				},
+				
+				props: [
+					'msg_from_outside'
+				],
+				
+				methods: {
+					send_to_outside: function() {
+						this.$emit('to_outside_event', this.msg_to_outside);
+					}
+				}
+			});
+			
+			/* ------------------------------------------------------ */
+			
+			Vue.component('global_component_3', {
+				template: "#global_component_3_temp",
+				
+				data: function() {
+					return {}
+				},
+				props: [],
+				methods: {}
+			});
+			
+			/* ====================================================== */
+			
+			var vm1 = new Vue({
+				el: '#app1',
+				data: {
+					message: 'cieo!',
+				},
+				
+				methods: {
+				},
+				
+				filters: {
+				},
+				
+				computed: {
+				},
+				
+				components: {
+					local_component_1: {
+						template: "#local_component_1_temp",
+				
+						data: function() {
+							return {
+								message: 'Cieo Local!',
+							}
+						},
+						
+						props: [
+						],
+						
+						methods: {
+						}
+					}
+				}
+			});
+			
+			/* ------------------------------------------------------ */
+			
+			var vm2 = new Vue({
+				el: '#app2',
+				data: {
+					message: 'cieo!',
+				},
+				
+				methods: {
+				},
+				
+				filters: {
+				},
+				
+				computed: {
+				}
+			});
+			
+			/* ------------------------------------------------------ */
+			
+			var vm3 = new Vue({
+				el: '#app3',
+				data: {
+					message: 'cieo!',
+					data_to_component: 'To the container',
+					data_from_component: 'Waiting for component data',
+				},
+				
+				methods: {
+					load_data_from_component: function(v1) {
+						this.data_from_component = v1;
+					},
+					log_click_to_console: function() {
+						console.log('clicked!');
+					}
+				},
+				
+				filters: {
+				},
+				
+				computed: {
+				}
+			});
+		</script>
+	</body>
+</html>

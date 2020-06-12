@@ -1,0 +1,93 @@
+<html>
+	<head>
+		<title>Vue.js Calculator App</title>
+		
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		
+		<script type="text/javascript" src="vue.js"></script>
+		
+		<style>
+			#app {
+				text-align: center;
+			}
+			.container {
+				border: solid 1px #DDD;
+				padding: 2%;
+				margin: 2%;
+			}
+			
+		</style>
+	</head>
+	<body>
+		<div id="app">
+			<div class="container">
+				<!-- If we named the emitted event for instance "input_event" we should have written something like:
+				       <item label="Price" v-bind:value="price" v-on:input_event="price = arguments[0]"></item>
+				     
+				     Naming that just "input" will allow us to use the syntax sugar of v-model
+				 --> 
+				<item label="Price" v-model="price"></item>
+				<item label="Shipping" v-model="shipping"></item>
+				<item label="Discount" v-model="discount"></item>
+				<hr/>
+				<p>Total: {{total}}</p>
+			</div>
+		</div>
+		
+		<template id="item_template">
+			<div>
+				<label>{{label}}</label>
+				<br/>
+				<input v-bind:value="value" v-on:input="send($event.target.value)"/>
+			</div>
+		</template>
+		
+		<script type="text/javascript">
+			
+			Vue.component('item', {
+				template: "#item_template",
+				
+				data: function() {
+					return {
+						message: 'Cieo!',
+					}
+				},
+				props: [
+					'label',
+					'value'
+				],
+				methods: {
+					send: function(v) {
+						this.$emit('input', v);
+					}
+				}
+			});
+			
+			var vm = new Vue({
+				el: '#app',
+				data: {
+					price: 0.0,
+					shipping: 0.0,
+					discount: 0.0,
+				},
+				
+				methods: {
+				},
+				
+				filters: {
+				},
+				
+				computed: {
+					total: function() {
+						this.price = Number(this.price);
+						this.shipping = Number(this.shipping);
+						this.discount = Number(this.discount);
+						return this.price + this.shipping - this.discount;
+					}
+				},
+			});
+			
+		</script>
+	</body>
+</html>
